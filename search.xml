@@ -4,9 +4,53 @@
   
     
     <entry>
+      <title>简述css 中 BFC的应用</title>
+      <link href="/2022/09/28/BFC/"/>
+      <url>/2022/09/28/BFC/</url>
+      
+        <content type="html"><![CDATA[<h3 id="顾名思义，BFC（Block-Formatting-Context）块格式化上下文，就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。"><a href="#顾名思义，BFC（Block-Formatting-Context）块格式化上下文，就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。" class="headerlink" title="顾名思义，BFC（Block Formatting Context）块格式化上下文，就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。"></a>顾名思义，BFC（Block Formatting Context）块格式化上下文，就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。</h3><h4 id="解决了什么问题？"><a href="#解决了什么问题？" class="headerlink" title="解决了什么问题？"></a>解决了什么问题？</h4><ol><li>解决 margin 重叠；</li><li>实现两栏自适应布局或“圣杯”布局；</li><li>清除浮动；</li><li>…</li></ol><h4 id="如何实现？"><a href="#如何实现？" class="headerlink" title="如何实现？"></a>如何实现？</h4><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">常用的方式有以下几种：</span><br><span class="line"><span class="number">1</span>. 浮动元素（元素的<span class="attribute">float</span>不是 <span class="attribute">none</span>，指定<span class="attribute">float</span>为<span class="attribute">left</span>或者<span class="attribute">right</span>就可以创建BFC）</span><br><span class="line"><span class="number">2</span>. 绝对或固定定位（元素的 <span class="attribute">position</span> 为 absolute 或 fixed）</span><br><span class="line"><span class="number">3</span>. <span class="attribute">display</span>:inline-block，display:table-cell，display:flex，display:inline-flex</span><br><span class="line"><span class="number">4</span>. overflow指定除了visible的值</span><br></pre></td></tr></table></figure><h4 id="e-g"><a href="#e-g" class="headerlink" title="e.g."></a>e.g.</h4><h4 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h4><p>解决块级元素之间布局的互相影响都能应用到。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> CSS </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>vue-cli与vite的区别？</title>
+      <link href="/2022/09/27/vue-cli%E4%B8%8Evite%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9F/"/>
+      <url>/2022/09/27/vue-cli%E4%B8%8Evite%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9F/</url>
+      
+        <content type="html"><![CDATA[<h2 id="🤔-思考-vue-cli-与-vite-的区别？"><a href="#🤔-思考-vue-cli-与-vite-的区别？" class="headerlink" title="🤔 思考 vue-cli 与 vite 的区别？"></a>🤔 思考 vue-cli 与 vite 的区别？</h2><h3 id="vue-cli"><a href="#vue-cli" class="headerlink" title="vue-cli"></a>vue-cli</h3><ul><li>vue-cli 脚手架通过 webpack 创建一个包装器编译 vue 项目，webpack 是一个静态模块打包工具，可以通过 vue.config.js 深入配置 webpack。</li><li>开发过程中，webpack 从源代码构建项目并创建源代码的映射，通过持续增量构建的方式打包更改的文件和相关依赖并监听，以便将更改的文件打包并在浏览器中进行替换。</li><li>生产时，Webpack 基于 CommonJS API 来管理 JavaScript 模块。</li></ul><h3 id="vite"><a href="#vite" class="headerlink" title="vite"></a>vite</h3><ul><li>vite 使用 Rollup 打包程序打包构建项目，通过 vite.config.js 深入配置 Rollup。</li><li>开发过程中，vite 直接将入口文件（vue 项目通常是 main.js）作为 ES 模块发送到浏览器，根据需要将实际代码加载到浏览器中，在浏览器中运行的代码就是你正在使用的实际代码（和文件）。</li><li>这意味着它不会打包本地代码，相比 webpack 启动和构建项目时更快。</li><li>生产时，Rollup 依赖于 ES 模块，这意味着它可以比 Webpack 更轻松地进行静态分析，尽管这种差异非常小。</li></ul><h3 id="about"><a href="#about" class="headerlink" title="about"></a>about</h3><h5 id="ES6-模块与-CommonJS-模块差异"><a href="#ES6-模块与-CommonJS-模块差异" class="headerlink" title="ES6 模块与 CommonJS 模块差异"></a>ES6 模块与 CommonJS 模块差异</h5><ol><li>CommonJS 模块输出的是一个值的拷贝，ES6 模块输出的是值的引用。<br>注意：CommonJS 模块输出的是值的拷贝，也就是说，一旦输出一个值，模块内部的变化就影响不到这个值</li><li>ES6 模块是动态引用，并且不会缓存值，模块里面的变量绑定其所在的模块。<br>CommonJS 模块是运行时加载，ES6 模块是编译时输出接口。<br>原因：CommonJS 加载的是一个对象（即 module.exports 属性），该对象只有在脚本运行完才会生成。而 ES6 模块不是对象，它的对外接口只是一种静态定义，在代码静态解析阶段就会生成。</li><li>CommonJS 模块的 require()是同步加载模块，ES6 模块的 import 命令是异步加载，有一个独立的模块依赖的解析阶段。</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 构建工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JavaScript </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>catch 和 作用域</title>
-      <link href="/2022/09/27/trycatch/"/>
-      <url>/2022/09/27/trycatch/</url>
+      <link href="/2022/09/27/catch%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8%E5%9F%9F/"/>
+      <url>/2022/09/27/catch%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8%E5%9F%9F/</url>
       
         <content type="html"><![CDATA[<h2 id="catch-和-作用域"><a href="#catch-和-作用域" class="headerlink" title="catch 和 作用域"></a>catch 和 作用域</h2><p>🤔 思考: 以下表达式输出？</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> x;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>();</span><br><span class="line">&#125; <span class="keyword">catch</span> (x) &#123;</span><br><span class="line">    x = <span class="number">1</span>;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(x);</span><br><span class="line">&#125;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(x)</span><br></pre></td></tr></table></figure><p>答案解析：</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 考察 catch和作用域</span></span><br><span class="line"><span class="comment">// catch块指定一个标识符（下面为x），该标识符保存由throw语句指定的值。</span></span><br><span class="line"><span class="comment">// catch块是唯一的，因为输入catch块时，javascript会创建此标识符，并将其添加到当前作用域。</span></span><br><span class="line"><span class="comment">// 标识符仅在catch块执行时存在；catch块执行完成后，标识符不再可用。</span></span><br><span class="line"><span class="comment">// 答案 1 undefined</span></span><br><span class="line"><span class="keyword">let</span> x;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>();</span><br><span class="line">&#125; <span class="keyword">catch</span> (x) &#123;</span><br><span class="line">    <span class="comment">// x仅在catch块中可用</span></span><br><span class="line">    x = <span class="number">1</span>;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(x); <span class="comment">// 输出 1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(x) <span class="comment">// x从未赋值，输出 undefined</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
       
@@ -33,7 +77,7 @@
       <link href="/2022/09/14/%E6%BB%95%E7%8E%8B%E9%98%81%E5%BA%8F/"/>
       <url>/2022/09/14/%E6%BB%95%E7%8E%8B%E9%98%81%E5%BA%8F/</url>
       
-        <content type="html"><![CDATA[<h2 id="【作者】王勃"><a href="#【作者】王勃" class="headerlink" title="【作者】王勃"></a>【作者】王勃</h2><h2 id="【朝代】唐"><a href="#【朝代】唐" class="headerlink" title="【朝代】唐"></a>【朝代】唐</h2><p>  豫章故郡，洪都新府。星分翼轸，地接衡庐。襟三江而带五湖，控蛮荆而引瓯越。物华天宝，龙光射牛斗之墟；人杰地灵，徐孺下陈蕃之榻。雄州雾列，俊采星驰。台隍枕夷夏之交，宾主尽东南之美。都督阎公之雅望，棨戟遥临；宇文新州之懿范，襜帷暂驻。十旬休假，胜友如云；千里逢迎，高朋满座。腾蛟起凤，孟学士之词宗；紫电青霜，王将军之武库。家君作宰，路出名区；童子何知，躬逢胜饯。</p><p>时维九月，序属三秋。<mark class="hl-label green">潦水尽而寒潭清，烟光凝而暮山紫。</mark> 俨骖騑于上路，访风景于崇阿；临帝子之长洲，得天人之旧馆。层峦耸翠，上出重霄；飞阁流丹，下临无地。鹤汀凫渚，穷岛屿之萦回；桂殿兰宫，即冈峦之体势。</p><p>披绣闼，俯雕甍，山原旷其盈视，川泽纡其骇瞩。闾阎扑地，钟鸣鼎食之家；舸舰弥津，青雀黄龙之舳。云销雨霁，彩彻区明。<mark class="hl-label blue">落霞与孤鹜齐飞，秋水共长天一色。</mark> 渔舟唱晚，响穷彭蠡之滨；雁阵惊寒，声断衡阳之浦。</p><p>遥襟甫畅，逸兴遄飞。爽籁发而清风生，纤歌凝而白云遏。睢园绿竹，气凌彭泽之樽；邺水朱华，光照临川之笔。四美具，二难并。穷睇眄于中天，极娱游于暇日。天高地迥，觉宇宙之无穷；兴尽悲来，识盈虚之有数。望长安于日下，目吴会于云间。地势极而南溟深，天柱高而北辰远。关山难越，谁悲失路之人？萍水相逢，尽是他乡之客。怀帝阍而不见，奉宣室以何年？</p><p>嗟乎！时运不齐，命途多舛。冯唐易老，李广难封。屈贾谊于长沙，非无圣主；窜梁鸿于海曲，岂乏明时？所赖君子见机，达人知命。<mark class="hl-label purple">老当益壮，宁移白首之心？穷且益坚，不坠青云之志。</mark> 酌贪泉而觉爽，处涸辙以犹欢。北海虽赊，扶摇可接；东隅已逝，桑榆非晚。孟尝高洁，空余报国之情；阮籍猖狂，岂效穷途之哭！</p><p>勃，三尺微命，一介书生。无路请缨，等终军之弱冠；有怀投笔，慕宗悫之长风。舍簪笏于百龄，奉晨昏于万里。非谢家之宝树，接孟氏之芳邻。他日趋庭，叨陪鲤对；今兹捧袂，喜托龙门。杨意不逢，抚凌云而自惜；钟期既遇，奏流水以何惭？</p><p>呜乎！胜地不常，盛筵难再；兰亭已矣，梓泽丘墟。临别赠言，幸承恩于伟饯；登高作赋，是所望于群公。敢竭鄙怀，恭疏短引；一言均赋，四韵俱成。请洒潘江，各倾<mark class="hl-label pink">陆海云尔：</mark> </p><p>滕王高阁临江渚，佩玉鸣鸾罢歌舞。</p><p>画栋朝飞南浦云，珠帘暮卷西山雨。</p><p>闲云潭影日悠悠，物换星移几度秋。</p><p>阁中帝子今何在？槛外长江空自流。</p>]]></content>
+        <content type="html"><![CDATA[<h2 id="【作者】王勃"><a href="#【作者】王勃" class="headerlink" title="【作者】王勃"></a>【作者】王勃</h2><h2 id="【朝代】唐"><a href="#【朝代】唐" class="headerlink" title="【朝代】唐"></a>【朝代】唐</h2><p>豫章故郡，洪都新府。星分翼轸，地接衡庐。襟三江而带五湖，控蛮荆而引瓯越。物华天宝，龙光射牛斗之墟；人杰地灵，徐孺下陈蕃之榻。雄州雾列，俊采星驰。台隍枕夷夏之交，宾主尽东南之美。都督阎公之雅望，棨戟遥临；宇文新州之懿范，襜帷暂驻。十旬休假，胜友如云；千里逢迎，高朋满座。腾蛟起凤，孟学士之词宗；紫电青霜，王将军之武库。家君作宰，路出名区；童子何知，躬逢胜饯。</p><p>时维九月，序属三秋。<mark class="hl-label green">潦水尽而寒潭清，烟光凝而暮山紫。</mark> 俨骖騑于上路，访风景于崇阿；临帝子之长洲，得天人之旧馆。层峦耸翠，上出重霄；飞阁流丹，下临无地。鹤汀凫渚，穷岛屿之萦回；桂殿兰宫，即冈峦之体势。</p><p>披绣闼，俯雕甍，山原旷其盈视，川泽纡其骇瞩。闾阎扑地，钟鸣鼎食之家；舸舰弥津，青雀黄龙之舳。云销雨霁，彩彻区明。<mark class="hl-label blue">落霞与孤鹜齐飞，秋水共长天一色。</mark> 渔舟唱晚，响穷彭蠡之滨；雁阵惊寒，声断衡阳之浦。</p><p>遥襟甫畅，逸兴遄飞。爽籁发而清风生，纤歌凝而白云遏。睢园绿竹，气凌彭泽之樽；邺水朱华，光照临川之笔。四美具，二难并。穷睇眄于中天，极娱游于暇日。天高地迥，觉宇宙之无穷；兴尽悲来，识盈虚之有数。望长安于日下，目吴会于云间。地势极而南溟深，天柱高而北辰远。关山难越，谁悲失路之人？萍水相逢，尽是他乡之客。怀帝阍而不见，奉宣室以何年？</p><p>嗟乎！时运不齐，命途多舛。冯唐易老，李广难封。屈贾谊于长沙，非无圣主；窜梁鸿于海曲，岂乏明时？所赖君子见机，达人知命。<mark class="hl-label purple">老当益壮，宁移白首之心？穷且益坚，不坠青云之志。</mark> 酌贪泉而觉爽，处涸辙以犹欢。北海虽赊，扶摇可接；东隅已逝，桑榆非晚。孟尝高洁，空余报国之情；阮籍猖狂，岂效穷途之哭！</p><p>勃，三尺微命，一介书生。无路请缨，等终军之弱冠；有怀投笔，慕宗悫之长风。舍簪笏于百龄，奉晨昏于万里。非谢家之宝树，接孟氏之芳邻。他日趋庭，叨陪鲤对；今兹捧袂，喜托龙门。杨意不逢，抚凌云而自惜；钟期既遇，奏流水以何惭？</p><p>呜乎！胜地不常，盛筵难再；兰亭已矣，梓泽丘墟。临别赠言，幸承恩于伟饯；登高作赋，是所望于群公。敢竭鄙怀，恭疏短引；一言均赋，四韵俱成。请洒潘江，各倾<mark class="hl-label pink">陆海云尔：</mark> </p><p>滕王高阁临江渚，佩玉鸣鸾罢歌舞。</p><p>画栋朝飞南浦云，珠帘暮卷西山雨。</p><p>闲云潭影日悠悠，物换星移几度秋。</p><p>阁中帝子今何在？槛外长江空自流。</p>]]></content>
       
       
       <categories>
@@ -58,7 +102,7 @@
       <link href="/2022/09/14/%E5%B2%B3%E9%98%B3%E6%A5%BC%E8%AE%B0/"/>
       <url>/2022/09/14/%E5%B2%B3%E9%98%B3%E6%A5%BC%E8%AE%B0/</url>
       
-        <content type="html"><![CDATA[<h2 id="【作者】范仲淹"><a href="#【作者】范仲淹" class="headerlink" title="【作者】范仲淹"></a>【作者】范仲淹</h2><h2 id="【朝代】宋"><a href="#【朝代】宋" class="headerlink" title="【朝代】宋"></a>【朝代】宋</h2><p>  庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴，乃重修岳阳楼，增其旧制，刻唐贤今人诗赋于其上，属予作文以记之。</p><p>予观夫巴陵胜状，在洞庭一湖。衔远山，吞长江，浩浩汤汤，横无际涯，朝晖夕阴，气象万千，此则岳阳楼之大观也，前人之述备矣。然则北通巫峡，南极潇湘，迁客骚人，多会于此，览物之情，得无异乎？</p><p>若夫淫雨霏霏，连月不开，阴风怒号，浊浪排空，日星隐曜，山岳潜形，商旅不行，樯倾楫摧，薄暮冥冥，虎啸猿啼。登斯楼也，则有去国怀乡，忧谗畏讥，满目萧然，感极而悲者矣。</p><p>至若春和景明，波澜不惊，上下天光，一碧万顷，沙鸥翔集，锦鳞游泳，岸芷汀兰，郁郁青青。而或长烟一空，皓月千里，浮光跃金，静影沉璧，渔歌互答，此乐何极！登斯楼也，则有心旷神怡，宠辱偕忘，把酒临风，其喜洋洋者矣。</p><p>嗟夫！予尝求古仁人之心，或异二者之为，何哉？<mark class="hl-label green">不以物喜，不以己悲，居庙堂之高则忧其民，处江湖之远则忧其君。</mark> 是进亦忧，退亦忧。然则何时而乐耶？其必曰“先天下之忧而忧，后天下之乐而乐”乎！噫！微斯人，吾谁与归？</p><mark class="hl-label blue">时六年九月十五日。</mark> ]]></content>
+        <content type="html"><![CDATA[<h2 id="【作者】范仲淹"><a href="#【作者】范仲淹" class="headerlink" title="【作者】范仲淹"></a>【作者】范仲淹</h2><h2 id="【朝代】宋"><a href="#【朝代】宋" class="headerlink" title="【朝代】宋"></a>【朝代】宋</h2><p>庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴，乃重修岳阳楼，增其旧制，刻唐贤今人诗赋于其上，属予作文以记之。</p><p>予观夫巴陵胜状，在洞庭一湖。衔远山，吞长江，浩浩汤汤，横无际涯，朝晖夕阴，气象万千，此则岳阳楼之大观也，前人之述备矣。然则北通巫峡，南极潇湘，迁客骚人，多会于此，览物之情，得无异乎？</p><p>若夫淫雨霏霏，连月不开，阴风怒号，浊浪排空，日星隐曜，山岳潜形，商旅不行，樯倾楫摧，薄暮冥冥，虎啸猿啼。登斯楼也，则有去国怀乡，忧谗畏讥，满目萧然，感极而悲者矣。</p><p>至若春和景明，波澜不惊，上下天光，一碧万顷，沙鸥翔集，锦鳞游泳，岸芷汀兰，郁郁青青。而或长烟一空，皓月千里，浮光跃金，静影沉璧，渔歌互答，此乐何极！登斯楼也，则有心旷神怡，宠辱偕忘，把酒临风，其喜洋洋者矣。</p><p>嗟夫！予尝求古仁人之心，或异二者之为，何哉？<mark class="hl-label green">不以物喜，不以己悲，居庙堂之高则忧其民，处江湖之远则忧其君。</mark> 是进亦忧，退亦忧。然则何时而乐耶？其必曰“先天下之忧而忧，后天下之乐而乐”乎！噫！微斯人，吾谁与归？</p><mark class="hl-label blue">时六年九月十五日。</mark> ]]></content>
       
       
       <categories>
@@ -83,7 +127,7 @@
       <link href="/2022/09/14/%E5%87%BA%E5%B8%88%E8%A1%A8/"/>
       <url>/2022/09/14/%E5%87%BA%E5%B8%88%E8%A1%A8/</url>
       
-        <content type="html"><![CDATA[<h2 id="【作者】诸葛亮"><a href="#【作者】诸葛亮" class="headerlink" title="【作者】诸葛亮"></a>【作者】诸葛亮</h2><h2 id="【朝代】三国时期"><a href="#【朝代】三国时期" class="headerlink" title="【朝代】三国时期"></a>【朝代】三国时期</h2><p>  臣亮言：<mark class="hl-label default">先帝</mark> 创业未半，而<mark class="hl-label blue">中道崩殂</mark> 。今天下三分，<mark class="hl-label pink">益州疲敝</mark> ，此诚<mark class="hl-label red">危急存亡之秋</mark> 也！然侍衞之臣，不懈于内；<mark class="hl-label purple">忠志之士</mark> ，忘身于外者，盖追先帝之殊遇，欲报之于陛下也。诚宜开张圣听，以光先帝遗德，恢弘志士之气；不宜妄自菲薄，引喻失义，以塞忠谏之路也。</p><p>宫中、府中，俱为一体；陟罚臧否，不宜异同。若有<mark class="hl-label orange">作奸</mark> 、<mark class="hl-label green">犯科</mark> ，及为忠善者，宜付有司，论其刑赏，以昭陛下平明之治；不宜偏私，使内外异法也。</p><p>侍中、侍郎郭攸之、费祎、董允等，此皆良实，志虑忠纯，是以先帝简拔以遗陛下。<mark class="hl-label blue">愚以为宫中之事，事无大小，悉以咨之，然后施行，必能裨补阙漏，有所广益。</mark> </p><p>将军向宠，性行淑均，晓畅军事，试用于昔日，先帝称之曰能，是以众议举宠为督。愚以为营中之事，悉以咨之，必能使行阵和睦，优劣得所。</p><mark class="hl-label green">亲贤臣，远小人，此先汉所以兴隆也；</mark> <mark class="hl-label red">亲小人，远贤臣，此后汉所以倾颓也。</mark> 先帝在时，每与臣论此事，未尝不叹息痛恨于桓、灵也。侍中、尚书、长史、参军，此悉贞良死节之臣，愿陛下亲之信之，则汉室之隆，可计日而待也。<mark class="hl-label purple">臣本布衣，躬耕于南阳，苟全性命于乱世，不求闻达于诸侯。</mark> 先帝不以臣卑鄙，猥自枉屈，三顾臣于草庐之中，咨臣以当世之事，由是感激，遂许先帝以驱驰。后值倾覆，受任于败军之际，奉命于危难之间，尔来二十有一年矣。<p>先帝知臣谨慎，故临崩寄臣以大事也。<mark class="hl-label pink">受命以来，夙夜忧叹，恐托付不效，</mark> 以伤先帝之明，故五月渡泸，深入不毛。今南方已定，兵甲已足，当奖率三军，北定中原，庶竭驽钝，攘除奸凶，兴复汉室，还于旧都。此臣所以报先帝而忠陛下之职分也。至于斟酌损益，进尽忠言，则攸之、祎、允之任也。</p><p>愿陛下托臣以讨贼兴复之效，不效，则治臣之罪，以告先帝之灵。若无兴德之言，则责攸之、祎、允等之慢，以彰其咎；陛下亦宜自谋，以咨诹善道，察纳雅言，深追先帝遗诏，臣不胜受恩感激。</p><mark class="hl-label green">今当远离，临表涕零，不知所言。</mark> ]]></content>
+        <content type="html"><![CDATA[<h2 id="【作者】诸葛亮"><a href="#【作者】诸葛亮" class="headerlink" title="【作者】诸葛亮"></a>【作者】诸葛亮</h2><h2 id="【朝代】三国时期"><a href="#【朝代】三国时期" class="headerlink" title="【朝代】三国时期"></a>【朝代】三国时期</h2><p>臣亮言：<mark class="hl-label default">先帝</mark> 创业未半，而<mark class="hl-label blue">中道崩殂</mark> 。今天下三分，<mark class="hl-label pink">益州疲敝</mark> ，此诚<mark class="hl-label red">危急存亡之秋</mark> 也！然侍衞之臣，不懈于内；<mark class="hl-label purple">忠志之士</mark> ，忘身于外者，盖追先帝之殊遇，欲报之于陛下也。诚宜开张圣听，以光先帝遗德，恢弘志士之气；不宜妄自菲薄，引喻失义，以塞忠谏之路也。</p><p>宫中、府中，俱为一体；陟罚臧否，不宜异同。若有<mark class="hl-label orange">作奸</mark> 、<mark class="hl-label green">犯科</mark> ，及为忠善者，宜付有司，论其刑赏，以昭陛下平明之治；不宜偏私，使内外异法也。</p><p>侍中、侍郎郭攸之、费祎、董允等，此皆良实，志虑忠纯，是以先帝简拔以遗陛下。<mark class="hl-label blue">愚以为宫中之事，事无大小，悉以咨之，然后施行，必能裨补阙漏，有所广益。</mark> </p><p>将军向宠，性行淑均，晓畅军事，试用于昔日，先帝称之曰能，是以众议举宠为督。愚以为营中之事，悉以咨之，必能使行阵和睦，优劣得所。</p><mark class="hl-label green">亲贤臣，远小人，此先汉所以兴隆也；</mark> <mark class="hl-label red">亲小人，远贤臣，此后汉所以倾颓也。</mark> 先帝在时，每与臣论此事，未尝不叹息痛恨于桓、灵也。侍中、尚书、长史、参军，此悉贞良死节之臣，愿陛下亲之信之，则汉室之隆，可计日而待也。<mark class="hl-label purple">臣本布衣，躬耕于南阳，苟全性命于乱世，不求闻达于诸侯。</mark> 先帝不以臣卑鄙，猥自枉屈，三顾臣于草庐之中，咨臣以当世之事，由是感激，遂许先帝以驱驰。后值倾覆，受任于败军之际，奉命于危难之间，尔来二十有一年矣。<p>先帝知臣谨慎，故临崩寄臣以大事也。<mark class="hl-label pink">受命以来，夙夜忧叹，恐托付不效，</mark> 以伤先帝之明，故五月渡泸，深入不毛。今南方已定，兵甲已足，当奖率三军，北定中原，庶竭驽钝，攘除奸凶，兴复汉室，还于旧都。此臣所以报先帝而忠陛下之职分也。至于斟酌损益，进尽忠言，则攸之、祎、允之任也。</p><p>愿陛下托臣以讨贼兴复之效，不效，则治臣之罪，以告先帝之灵。若无兴德之言，则责攸之、祎、允等之慢，以彰其咎；陛下亦宜自谋，以咨诹善道，察纳雅言，深追先帝遗诏，臣不胜受恩感激。</p><mark class="hl-label green">今当远离，临表涕零，不知所言。</mark> ]]></content>
       
       
       <categories>
