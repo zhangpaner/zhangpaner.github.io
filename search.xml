@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>ES6模块化 - import语句提升效果</title>
+      <link href="/2022/09/28/ES6%E6%A8%A1%E5%9D%97%E5%8C%96/"/>
+      <url>/2022/09/28/ES6%E6%A8%A1%E5%9D%97%E5%8C%96/</url>
+      
+        <content type="html"><![CDATA[<h4 id="以下-index-js-文件的代码执行后，控制台中的输出内容？"><a href="#以下-index-js-文件的代码执行后，控制台中的输出内容？" class="headerlink" title="以下 index.js 文件的代码执行后，控制台中的输出内容？"></a>以下 index.js 文件的代码执行后，控制台中的输出内容？</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">import</span> &#123; sum &#125; <span class="keyword">from</span> <span class="string">&#x27;./util.js&#x27;</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">sum</span>(<span class="number">1</span>, <span class="number">2</span>))</span><br></pre></td></tr></table></figure><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// util.js</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="title function_">sum</span> = (<span class="params">a, b</span>) =&gt; a + b</span><br></pre></td></tr></table></figure><h4 id="答案解析"><a href="#答案解析" class="headerlink" title="答案解析"></a>答案解析</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 答案 2 1 3</span></span><br><span class="line"><span class="comment">// 考察es6 模块化</span></span><br><span class="line"><span class="comment">// import 命令是在编译阶段执行的</span></span><br><span class="line"><span class="comment">// 并且 import 具有提升效果，会提升到整个模板的头部</span></span><br><span class="line"><span class="comment">// 所以模块合并后相当于：</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="title function_">sum</span> = (<span class="params">a, b</span>) =&gt; a + b</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="number">1</span>)</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">sum</span>(<span class="number">1</span>, <span class="number">2</span>))</span><br></pre></td></tr></table></figure><h4 id="about"><a href="#about" class="headerlink" title="about"></a>about</h4><h5 id="javascript-的预编译与运行时"><a href="#javascript-的预编译与运行时" class="headerlink" title="javascript 的预编译与运行时"></a>javascript 的预编译与运行时</h5><p>首先我们了解下编译时发生了什么？<br>先说下函数编译时发生的事情。</p><ol><li>创建 AO 对象（Activation Object(执行期上下文)）</li><li>找形参和变量声明，将变量和形参名作为 AO 属性名，值为 undefined</li><li>将实参值与形参相统一</li><li>在函数中找函数声明，作为属性名，值为函数体</li></ol><p>编译完成后，接下来 js 引擎才会运行相关代码</p><p>以上</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 每日一练 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JavaScript </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>简述css 中 BFC的应用</title>
       <link href="/2022/09/28/BFC/"/>
       <url>/2022/09/28/BFC/</url>
