@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>JavaScript 进阶：Promise 链、错误处理与并发控制 | Zhang Pan.</title><meta name="keywords" content="JavaScript,异步编程"><meta name="author" content="Zhang Pan"><meta name="copyright" content="Zhang Pan"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="理解 Promise 状态与链式传递，掌握组合方法、错误处理和简单并发限制。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript 进阶：Promise 链、错误处理与并发控制">
+<meta property="og:url" content="https://zhangpaner.github.io/2026/09/24/JS%E8%BF%9B%E9%98%B6-Promise%E4%B8%8E%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/index.html">
+<meta property="og:site_name" content="Zhang Pan.">
+<meta property="og:description" content="理解 Promise 状态与链式传递，掌握组合方法、错误处理和简单并发限制。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhangpaner.github.io/img/covers/promise.png">
+<meta property="article:published_time" content="2026-09-24T16:30:00.000Z">
+<meta property="article:modified_time" content="2026-09-24T15:42:55.832Z">
+<meta property="article:author" content="Zhang Pan">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="异步编程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhangpaner.github.io/img/covers/promise.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhangpaner.github.io/2026/09/24/JS%E8%BF%9B%E9%98%B6-Promise%E4%B8%8E%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'mediumZoom',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'JavaScript 进阶：Promise 链、错误处理与并发控制',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2026-09-24 08:42:55'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://avatars.githubusercontent.com/u/27272817?v=4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">30</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/covers/promise.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Zhang Pan.</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">JavaScript 进阶：Promise 链、错误处理与并发控制</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-09-24T16:30:00.000Z" title="发表于 2026-09-24 09:30:00">2026-09-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-09-24T15:42:55.832Z" title="更新于 2026-09-24 08:42:55">2026-09-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JavaScript%E8%BF%9B%E9%98%B6/">JavaScript进阶</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">715</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="JavaScript 进阶：Promise 链、错误处理与并发控制"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="Promise-表示未来完成的结果"><a href="#Promise-表示未来完成的结果" class="headerlink" title="Promise 表示未来完成的结果"></a>Promise 表示未来完成的结果</h2><p>Promise 有三种状态：<code>pending</code>、<code>fulfilled</code>、<code>rejected</code>。状态一旦确定就不会再改变。<code>then</code> 返回新的 Promise，因此可以把异步步骤连成链。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">fetch</span>(<span class="string">&#x27;/api/user&#x27;</span>)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function"><span class="params">response</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (!response.<span class="property">ok</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;HTTP &#x27;</span> + response.<span class="property">status</span>);</span><br><span class="line">    <span class="keyword">return</span> response.<span class="title function_">json</span>();</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function"><span class="params">user</span> =&gt;</span> user.<span class="property">name</span>)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function"><span class="params">name</span> =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(name))</span><br><span class="line">  .<span class="title function_">catch</span>(<span class="function"><span class="params">error</span> =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&#x27;读取用户失败：&#x27;</span>, error));</span><br></pre></td></tr></table></figure>
+
+<p>每个 <code>then</code> 回调的返回值会决定下一个 Promise：普通值会成为成功结果；返回 Promise 会等待它；抛出异常会使链进入失败状态。忘记 <code>return response.json()</code> 是常见错误，会令后续拿不到解析后的数据。</p>
+<h2 id="finally-和错误恢复"><a href="#finally-和错误恢复" class="headerlink" title="finally 和错误恢复"></a>finally 和错误恢复</h2><p><code>finally</code> 适合释放加载状态或资源，不会接收原结果。若它正常完成，原来的成功或失败结果会继续传递；如果它抛错，则链会改为失败。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">setLoading</span>(<span class="literal">true</span>);</span><br><span class="line"><span class="title function_">loadData</span>()</span><br><span class="line">  .<span class="title function_">then</span>(render)</span><br><span class="line">  .<span class="title function_">catch</span>(showError)</span><br><span class="line">  .<span class="title function_">finally</span>(<span class="function">() =&gt;</span> <span class="title function_">setLoading</span>(<span class="literal">false</span>));</span><br></pre></td></tr></table></figure>
+
+<p><code>catch</code> 也可以恢复错误：返回普通值后，后续链会继续成功状态。如果错误不能处理，就重新抛出，或让它继续传递给调用者。</p>
+<h2 id="选择正确的组合方法"><a href="#选择正确的组合方法" class="headerlink" title="选择正确的组合方法"></a>选择正确的组合方法</h2><ul>
+<li><code>Promise.all</code>：全部成功才成功；有一个失败就立即失败。适合结果缺一不可的并行读取。</li>
+<li><code>Promise.allSettled</code>：等待全部结束，逐项返回成功或失败状态。适合批量操作并汇总每项结果。</li>
+<li><code>Promise.race</code>：第一个完成（成功或失败）者决定结果，常用于竞争超时。</li>
+<li><code>Promise.any</code>：第一个成功者决定结果；全部失败时以 <code>AggregateError</code> 拒绝。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> results = <span class="keyword">await</span> <span class="title class_">Promise</span>.<span class="title function_">allSettled</span>(ids.<span class="title function_">map</span>(loadOne));</span><br><span class="line"><span class="keyword">const</span> successes = results</span><br><span class="line">  .<span class="title function_">filter</span>(<span class="function"><span class="params">item</span> =&gt;</span> item.<span class="property">status</span> === <span class="string">&#x27;fulfilled&#x27;</span>)</span><br><span class="line">  .<span class="title function_">map</span>(<span class="function"><span class="params">item</span> =&gt;</span> item.<span class="property">value</span>);</span><br></pre></td></tr></table></figure>
+
+<p>注意，Promise 组合不会自动取消仍在进行的请求。<code>race</code> 超时后，慢请求依然可能继续消耗资源。</p>
+<h2 id="限制并发数量"><a href="#限制并发数量" class="headerlink" title="限制并发数量"></a>限制并发数量</h2><p>一次对数千条记录执行 <code>Promise.all(items.map(doWork))</code> 会同时启动大量任务。可用小型工作池控制同时运行任务数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">mapWithLimit</span>(<span class="params">items, limit, worker</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> results = <span class="keyword">new</span> <span class="title class_">Array</span>(items.<span class="property">length</span>);</span><br><span class="line">  <span class="keyword">let</span> next = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">runWorker</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> index = next++;</span><br><span class="line">      <span class="keyword">if</span> (index &gt;= items.<span class="property">length</span>) <span class="keyword">return</span>;</span><br><span class="line">      results[index] = <span class="keyword">await</span> <span class="title function_">worker</span>(items[index], index);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> count = <span class="title class_">Math</span>.<span class="title function_">min</span>(limit, items.<span class="property">length</span>);</span><br><span class="line">  <span class="keyword">await</span> <span class="title class_">Promise</span>.<span class="title function_">all</span>(<span class="title class_">Array</span>.<span class="title function_">from</span>(&#123; <span class="attr">length</span>: count &#125;, runWorker));</span><br><span class="line">  <span class="keyword">return</span> results;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> users = <span class="keyword">await</span> <span class="title function_">mapWithLimit</span>(userIds, <span class="number">4</span>, loadUser);</span><br></pre></td></tr></table></figure>
+
+<p>共享的 <code>next</code> 在同一 JavaScript 线程里每次递增是同步完成的，因此每个索引只会分配一次。生产实现还应明确单项失败时整体停止还是继续收集错误，并检查 <code>limit</code> 是正整数。</p>
+<p>Promise 负责表达异步结果，不会自动把耗时 CPU 计算移到另一个线程。大量同步计算仍会阻塞当前线程；浏览器中可考虑 Web Worker。网络等异步 I&#x2F;O 的并发应按服务端限制和资源能力控制。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://zhangpaner.github.io">Zhang Pan</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zhangpaner.github.io/2026/09/24/JS%E8%BF%9B%E9%98%B6-Promise%E4%B8%8E%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/">https://zhangpaner.github.io/2026/09/24/JS%E8%BF%9B%E9%98%B6-Promise%E4%B8%8E%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhangpaner.github.io" target="_blank">Zhang Pan.</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/JavaScript/">JavaScript</a><a class="post-meta__tags" href="/tags/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/">异步编程</a></div><div class="post_share"><div class="social-share" data-image="/img/covers/promise.png" data-sites="wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2026/09/24/JS%E8%BF%9B%E9%98%B6-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E4%B8%8E%E4%BB%BB%E5%8A%A1%E9%98%9F%E5%88%97/"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/covers/event-loop.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">JavaScript 进阶：事件循环、微任务与宏任务</div></div></a></div><div class="next-post pull-right"><a href="/2026/09/24/JS%E8%BF%9B%E9%98%B6-%E5%8E%9F%E5%9E%8B%E9%93%BE%E4%B8%8E%E7%BB%A7%E6%89%BF/"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/covers/prototype.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">JavaScript 进阶：原型链、继承与 class</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2026/09/24/JS%E8%BF%9B%E9%98%B6-async-await%E4%B8%8E%E8%AF%B7%E6%B1%82%E5%8F%96%E6%B6%88/" title="JavaScript 进阶：async&#x2F;await、并行执行与请求取消"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/covers/async-await.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-24</div><div class="title">JavaScript 进阶：async&#x2F;await、并行执行与请求取消</div></div></a></div><div><a href="/2026/09/24/JS%E8%BF%9B%E9%98%B6-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E4%B8%8E%E4%BB%BB%E5%8A%A1%E9%98%9F%E5%88%97/" title="JavaScript 进阶：事件循环、微任务与宏任务"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/covers/event-loop.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-24</div><div class="title">JavaScript 进阶：事件循环、微任务与宏任务</div></div></a></div><div><a href="/2022/09/28/ES6%E6%A8%A1%E5%9D%97%E5%8C%96/" title="ES6模块化 - import语句提升效果"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic3.zhimg.com%2Fv2-38717bdbc55a3628e5a42ea63d513f3b_1440w.jpg%3Fsource%3D172ae18b&refer=http%3A%2F%2Fpic3.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1666842876&t=8af1f654af0d78390610e9a5aed2b948" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-09-28</div><div class="title">ES6模块化 - import语句提升效果</div></div></a></div><div><a href="/2022/09/29/JS%E4%B8%AD%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%92%8C%E5%BC%95%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" title="JavaScript基本数据类型和引用数据类型"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2020/4/8/1715a4f12eb44335~tplv-t2oaga2asx-zoom-crop-mark:3024:3024:3024:1702.awebp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-09-29</div><div class="title">JavaScript基本数据类型和引用数据类型</div></div></a></div><div><a href="/2022/09/27/catch%E5%8F%8A%E5%85%B6%E4%BD%9C%E7%94%A8%E5%9F%9F/" title="catch 和 作用域"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic3.zhimg.com%2Fv2-38717bdbc55a3628e5a42ea63d513f3b_1440w.jpg%3Fsource%3D172ae18b&refer=http%3A%2F%2Fpic3.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1666842876&t=8af1f654af0d78390610e9a5aed2b948" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-09-27</div><div class="title">catch 和 作用域</div></div></a></div><div><a href="/2022/09/27/vue-cli%E4%B8%8Evite%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9F/" title="vue-cli与vite的区别？"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://vitejs.cn/logo.svg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-09-27</div><div class="title">vue-cli与vite的区别？</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div id="comment-switch"><span class="first-comment">Valine</span><span class="switch-btn"></span><span class="second-comment">Disqus</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://avatars.githubusercontent.com/u/27272817?v=4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Zhang Pan</div><div class="author-info__description">技术博客，记录学习笔记。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">30</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhangpaner"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/zhangpaner" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:iamnotacoder@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">感谢访问本站，若喜欢请收藏 ^_^</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Promise-%E8%A1%A8%E7%A4%BA%E6%9C%AA%E6%9D%A5%E5%AE%8C%E6%88%90%E7%9A%84%E7%BB%93%E6%9E%9C"><span class="toc-number">1.</span> <span class="toc-text">Promise 表示未来完成的结果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#finally-%E5%92%8C%E9%94%99%E8%AF%AF%E6%81%A2%E5%A4%8D"><span class="toc-number">2.</span> <span class="toc-text">finally 和错误恢复</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%89%E6%8B%A9%E6%AD%A3%E7%A1%AE%E7%9A%84%E7%BB%84%E5%90%88%E6%96%B9%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">选择正确的组合方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%90%E5%88%B6%E5%B9%B6%E5%8F%91%E6%95%B0%E9%87%8F"><span class="toc-number">4.</span> <span class="toc-text">限制并发数量</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E8%B7%A8%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%89%93%E5%8C%85%E7%BB%8F%E9%AA%8C/" title="Qt 进阶（十）：跨平台部署与打包经验"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（十）：跨平台部署与打包经验"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E8%B7%A8%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%89%93%E5%8C%85%E7%BB%8F%E9%AA%8C/" title="Qt 进阶（十）：跨平台部署与打包经验">Qt 进阶（十）：跨平台部署与打包经验</a><time datetime="2026-09-24T18:30:00.000Z" title="发表于 2026-09-24 11:30:00">2026-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-CMake%E7%BC%96%E8%AF%91%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%8E%92%E9%94%99/" title="Qt 进阶（九）：CMake 编译配置、依赖管理与排错"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（九）：CMake 编译配置、依赖管理与排错"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-CMake%E7%BC%96%E8%AF%91%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%8E%92%E9%94%99/" title="Qt 进阶（九）：CMake 编译配置、依赖管理与排错">Qt 进阶（九）：CMake 编译配置、依赖管理与排错</a><time datetime="2026-09-24T18:20:00.000Z" title="发表于 2026-09-24 11:20:00">2026-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/" title="Qt 进阶（八）：线程与后台任务"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（八）：线程与后台任务"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/" title="Qt 进阶（八）：线程与后台任务">Qt 进阶（八）：线程与后台任务</a><time datetime="2026-09-24T18:10:00.000Z" title="发表于 2026-09-24 11:10:00">2026-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/" title="Qt 进阶（七）：网络请求与异步界面"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（七）：网络请求与异步界面"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/" title="Qt 进阶（七）：网络请求与异步界面">Qt 进阶（七）：网络请求与异步界面</a><time datetime="2026-09-24T18:00:00.000Z" title="发表于 2026-09-24 11:00:00">2026-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-ModelView%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/" title="Qt 进阶（六）：Model/View 表格数据管理"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（六）：Model/View 表格数据管理"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-ModelView%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/" title="Qt 进阶（六）：Model/View 表格数据管理">Qt 进阶（六）：Model/View 表格数据管理</a><time datetime="2026-09-24T17:50:00.000Z" title="发表于 2026-09-24 10:50:00">2026-09-24</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2017 - 2026 By Zhang Pan</div><div class="footer_custom_text">Hi, welcome to zhangpan's <a href="#">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom/dist/medium-zoom.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'EybdvXetRON5WgVc3ZMucvJo-gzGzoHsz',
+      appKey: 'xUemk7kjCNPYhrKAQaja20qP',
+      avatar: 'hide',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script>function loadDisqus () {
+  var disqus_config = function () {
+    this.page.url = 'https://zhangpaner.github.io/2026/09/24/JS%E8%BF%9B%E9%98%B6-Promise%E4%B8%8E%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/'
+    this.page.identifier = '/2026/09/24/JS%E8%BF%9B%E9%98%B6-Promise%E4%B8%8E%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/'
+    this.page.title = 'JavaScript 进阶：Promise 链、错误处理与并发控制'
+  };
+
+  window.disqusReset = () => {
+    DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  if (window.DISQUS) disqusReset()
+  else {
+    (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  }
+
+  document.getElementById('darkmode').addEventListener('click', () => {
+    setTimeout(() => window.disqusReset(), 200)
+  })
+}
+
+if ('Valine' === 'Disqus' || !true) {
+  if (true) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+  else loadDisqus()
+} else {
+  function loadOtherComment () {
+    loadDisqus()
+  }
+}
+</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
