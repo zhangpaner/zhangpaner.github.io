@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Qt 进阶（七）：网络请求与异步界面 | Zhang Pan.</title><meta name="keywords" content="Qt,网络编程"><meta name="author" content="Zhang Pan"><meta name="copyright" content="Zhang Pan"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="使用 QNetworkAccessManager 发起异步 HTTP 请求，在 GUI 线程安全更新界面并处理错误。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Qt 进阶（七）：网络请求与异步界面">
+<meta property="og:url" content="https://zhangpaner.github.io/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/index.html">
+<meta property="og:site_name" content="Zhang Pan.">
+<meta property="og:description" content="使用 QNetworkAccessManager 发起异步 HTTP 请求，在 GUI 线程安全更新界面并处理错误。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-24T18:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-24T16:17:40.736Z">
+<meta property="article:author" content="Zhang Pan">
+<meta property="article:tag" content="Qt">
+<meta property="article:tag" content="网络编程">
+<meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhangpaner.github.io/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'mediumZoom',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Qt 进阶（七）：网络请求与异步界面',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2026-09-24 09:17:40'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://avatars.githubusercontent.com/u/27272817?v=4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Zhang Pan.</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Qt 进阶（七）：网络请求与异步界面</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-09-24T18:00:00.000Z" title="发表于 2026-09-24 11:00:00">2026-09-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-09-24T16:17:40.736Z" title="更新于 2026-09-24 09:17:40">2026-09-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Qt%E5%BC%80%E5%8F%91/">Qt开发</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">669</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Qt 进阶（七）：网络请求与异步界面"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="为什么网络请求不能阻塞界面"><a href="#为什么网络请求不能阻塞界面" class="headerlink" title="为什么网络请求不能阻塞界面"></a>为什么网络请求不能阻塞界面</h2><p>GUI 主线程负责事件循环。若用阻塞式调用等待服务器，绘制、输入和窗口移动都无法及时处理，看起来像程序卡死。Qt Network 的 <code>QNetworkAccessManager</code> 采用异步请求：调用立即返回，响应完成后通过信号通知程序。</p>
+<p>在 CMake 中加入 Network：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">find_package</span>(Qt6 REQUIRED COMPONENTS Widgets Network)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(MyApp PRIVATE Qt6::Widgets Qt6::Network)</span><br></pre></td></tr></table></figure>
+
+<h2 id="GET-请求示例"><a href="#GET-请求示例" class="headerlink" title="GET 请求示例"></a>GET 请求示例</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QNetworkAccessManager&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QNetworkReply&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QNetworkRequest&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QUrl&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// manager 通常作为窗口成员，保证请求完成前一直存活。</span></span><br><span class="line"><span class="keyword">auto</span> *reply = manager-&gt;<span class="built_in">get</span>(<span class="built_in">QNetworkRequest</span>(<span class="built_in">QUrl</span>(<span class="string">&quot;https://httpbin.org/get&quot;</span>)));</span><br><span class="line"><span class="built_in">connect</span>(reply, &amp;QNetworkReply::finished, <span class="keyword">this</span>, [<span class="keyword">this</span>, reply] &#123;</span><br><span class="line">    <span class="type">const</span> <span class="keyword">auto</span> error = reply-&gt;<span class="built_in">error</span>();</span><br><span class="line">    <span class="type">const</span> QByteArray body = reply-&gt;<span class="built_in">readAll</span>();</span><br><span class="line">    <span class="keyword">if</span> (error == QNetworkReply::NoError) &#123;</span><br><span class="line">        statusLabel-&gt;<span class="built_in">setText</span>(QString::<span class="built_in">fromUtf8</span>(body));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        statusLabel-&gt;<span class="built_in">setText</span>(reply-&gt;<span class="built_in">errorString</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    reply-&gt;<span class="built_in">deleteLater</span>();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><code>QNetworkReply</code> 也是 QObject；请求完成后应释放它，常用 <code>deleteLater()</code>。将管理器作为长期存在的成员，可以复用连接配置和缓存策略。示例中的回调以窗口为接收对象，窗口销毁后连接会断开；真实项目还要定义取消请求和关闭窗口时的策略。</p>
+<h2 id="HTTP-状态码、JSON-和错误"><a href="#HTTP-状态码、JSON-和错误" class="headerlink" title="HTTP 状态码、JSON 和错误"></a>HTTP 状态码、JSON 和错误</h2><p>网络错误和 HTTP 状态码是两个层面的信息：DNS、TLS、超时等会反映在 <code>reply-&gt;error()</code>；服务器返回 404 或 500 时请求仍可能成功收到了 HTTP 响应，需读取 <code>HttpStatusCodeAttribute</code> 判断业务结果。对 JSON 响应使用 <code>QJsonDocument::fromJson()</code> 并检查解析错误，不要假设服务器永远返回正确格式。</p>
+<p>POST 请求应设置正确的 <code>Content-Type</code>，并对用户输入、认证信息和失败重试做清晰处理。认证令牌不要写死在源码或日志中。TLS 验证错误不能通过无条件忽略证书错误来“修复”。</p>
+<h2 id="超时、取消和防止过期结果"><a href="#超时、取消和防止过期结果" class="headerlink" title="超时、取消和防止过期结果"></a>超时、取消和防止过期结果</h2><p>页面切换或搜索词变化时，旧请求的响应可能晚于新请求到达。保存当前请求标识或 URL，只有响应仍对应当前页面时才更新界面。必要时调用 <code>abort()</code> 取消旧 <code>QNetworkReply</code>。设置合理超时（可通过定时器或 Qt 支持的超时配置完成），并为加载中、失败和空结果设计界面状态。</p>
+<h2 id="线程说明"><a href="#线程说明" class="headerlink" title="线程说明"></a>线程说明</h2><p><code>QNetworkAccessManager</code> 在自己的线程&#x2F;事件循环中异步工作，并不需要为普通 HTTP 请求另外创建线程。不要在主线程调用阻塞网络 API。若完成回调要处理大量数据，可把计算任务移到工作线程；回调更新 QWidget 时必须回到 GUI 线程。</p>
+<p>模块细节见 <a target="_blank" rel="noopener" href="https://doc.qt.io/qt-6/qtnetwork-index.html">Qt Network</a>。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://zhangpaner.github.io">Zhang Pan</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zhangpaner.github.io/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/">https://zhangpaner.github.io/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhangpaner.github.io" target="_blank">Zhang Pan.</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Qt/">Qt</a><a class="post-meta__tags" href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a></div><div class="post_share"><div class="social-share" data-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-sites="wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Qt 进阶（八）：线程与后台任务</div></div></a></div><div class="next-post pull-right"><a href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-ModelView%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Qt 进阶（六）：Model/View 表格数据管理</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2026/09/24/Qt%E5%85%A5%E9%97%A8-Widgets%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BF%A1%E5%8F%B7%E6%A7%BD/" title="Qt 入门（三）：Widgets 布局与信号槽"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-24</div><div class="title">Qt 入门（三）：Widgets 布局与信号槽</div></div></a></div><div><a href="/2026/09/24/Qt%E5%85%A5%E9%97%A8-%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%AA%97%E5%8F%A3%E4%B8%8ECMake%E9%A1%B9%E7%9B%AE/" title="Qt 入门（二）：第一个窗口与 CMake 项目"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-24</div><div class="title">Qt 入门（二）：第一个窗口与 CMake 项目</div></div></a></div><div><a href="/2026/09/24/Qt%E5%85%A5%E9%97%A8-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7%E9%93%BE/" title="Qt 入门（一）：环境搭建与开发工具链"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-24</div><div class="title">Qt 入门（一）：环境搭建与开发工具链</div></div></a></div><div><a href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-CMake%E7%BC%96%E8%AF%91%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%8E%92%E9%94%99/" title="Qt 进阶（九）：CMake 编译配置、依赖管理与排错"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-24</div><div class="title">Qt 进阶（九）：CMake 编译配置、依赖管理与排错</div></div></a></div><div><a href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-ModelView%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/" title="Qt 进阶（六）：Model&#x2F;View 表格数据管理"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-24</div><div class="title">Qt 进阶（六）：Model&#x2F;View 表格数据管理</div></div></a></div><div><a href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-QObject%E5%AF%B9%E8%B1%A1%E6%A0%91%E4%B8%8E%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86/" title="Qt 进阶（四）：QObject 对象树、资源管理与界面组织"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-24</div><div class="title">Qt 进阶（四）：QObject 对象树、资源管理与界面组织</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div id="comment-switch"><span class="first-comment">Valine</span><span class="switch-btn"></span><span class="second-comment">Disqus</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://avatars.githubusercontent.com/u/27272817?v=4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Zhang Pan</div><div class="author-info__description">技术博客，记录学习笔记。</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhangpaner"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/zhangpaner" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:iamnotacoder@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">感谢访问本站，若喜欢请收藏 ^_^</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8D%E8%83%BD%E9%98%BB%E5%A1%9E%E7%95%8C%E9%9D%A2"><span class="toc-number">1.</span> <span class="toc-text">为什么网络请求不能阻塞界面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GET-%E8%AF%B7%E6%B1%82%E7%A4%BA%E4%BE%8B"><span class="toc-number">2.</span> <span class="toc-text">GET 请求示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-%E7%8A%B6%E6%80%81%E7%A0%81%E3%80%81JSON-%E5%92%8C%E9%94%99%E8%AF%AF"><span class="toc-number">3.</span> <span class="toc-text">HTTP 状态码、JSON 和错误</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B6%85%E6%97%B6%E3%80%81%E5%8F%96%E6%B6%88%E5%92%8C%E9%98%B2%E6%AD%A2%E8%BF%87%E6%9C%9F%E7%BB%93%E6%9E%9C"><span class="toc-number">4.</span> <span class="toc-text">超时、取消和防止过期结果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E8%AF%B4%E6%98%8E"><span class="toc-number">5.</span> <span class="toc-text">线程说明</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E8%B7%A8%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%89%93%E5%8C%85%E7%BB%8F%E9%AA%8C/" title="Qt 进阶（十）：跨平台部署与打包经验"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（十）：跨平台部署与打包经验"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E8%B7%A8%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%89%93%E5%8C%85%E7%BB%8F%E9%AA%8C/" title="Qt 进阶（十）：跨平台部署与打包经验">Qt 进阶（十）：跨平台部署与打包经验</a><time datetime="2026-09-24T18:30:00.000Z" title="发表于 2026-09-24 11:30:00">2026-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-CMake%E7%BC%96%E8%AF%91%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%8E%92%E9%94%99/" title="Qt 进阶（九）：CMake 编译配置、依赖管理与排错"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（九）：CMake 编译配置、依赖管理与排错"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-CMake%E7%BC%96%E8%AF%91%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%8E%92%E9%94%99/" title="Qt 进阶（九）：CMake 编译配置、依赖管理与排错">Qt 进阶（九）：CMake 编译配置、依赖管理与排错</a><time datetime="2026-09-24T18:20:00.000Z" title="发表于 2026-09-24 11:20:00">2026-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/" title="Qt 进阶（八）：线程与后台任务"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（八）：线程与后台任务"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1/" title="Qt 进阶（八）：线程与后台任务">Qt 进阶（八）：线程与后台任务</a><time datetime="2026-09-24T18:10:00.000Z" title="发表于 2026-09-24 11:10:00">2026-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/" title="Qt 进阶（七）：网络请求与异步界面"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（七）：网络请求与异步界面"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/" title="Qt 进阶（七）：网络请求与异步界面">Qt 进阶（七）：网络请求与异步界面</a><time datetime="2026-09-24T18:00:00.000Z" title="发表于 2026-09-24 11:00:00">2026-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-ModelView%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/" title="Qt 进阶（六）：Model/View 表格数据管理"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 进阶（六）：Model/View 表格数据管理"/></a><div class="content"><a class="title" href="/2026/09/24/Qt%E8%BF%9B%E9%98%B6-ModelView%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/" title="Qt 进阶（六）：Model/View 表格数据管理">Qt 进阶（六）：Model/View 表格数据管理</a><time datetime="2026-09-24T17:50:00.000Z" title="发表于 2026-09-24 10:50:00">2026-09-24</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2017 - 2026 By Zhang Pan</div><div class="footer_custom_text">Hi, welcome to zhangpan's <a href="#">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom/dist/medium-zoom.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'EybdvXetRON5WgVc3ZMucvJo-gzGzoHsz',
+      appKey: 'xUemk7kjCNPYhrKAQaja20qP',
+      avatar: 'hide',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script>function loadDisqus () {
+  var disqus_config = function () {
+    this.page.url = 'https://zhangpaner.github.io/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/'
+    this.page.identifier = '/2026/09/24/Qt%E8%BF%9B%E9%98%B6-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%BC%82%E6%AD%A5%E7%95%8C%E9%9D%A2/'
+    this.page.title = 'Qt 进阶（七）：网络请求与异步界面'
+  };
+
+  window.disqusReset = () => {
+    DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  if (window.DISQUS) disqusReset()
+  else {
+    (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  }
+
+  document.getElementById('darkmode').addEventListener('click', () => {
+    setTimeout(() => window.disqusReset(), 200)
+  })
+}
+
+if ('Valine' === 'Disqus' || !true) {
+  if (true) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+  else loadDisqus()
+} else {
+  function loadOtherComment () {
+    loadDisqus()
+  }
+}
+</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
